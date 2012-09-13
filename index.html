@@ -1,0 +1,37 @@
+<html>
+    <head>
+    <script type="text/javascript" src="./utils.js"></script>
+    <script type="text/javascript" src="./blizzardapi.js"></script>
+    <script type="text/javascript" src="./hero.js"></script>
+    <script type="text/javascript" src="./profile.js"></script>
+    <script type="text/javascript">	
+	
+    	var a = Object.create(BlizzardApi);
+    	var profile, hero;
+/*
+    	a.callback = function () {
+    		profile = Object.create(Profile);
+    		profile.data = _clone(a.response);
+	   		console.log(profile);  	
+        }
+        
+    	a.getProfile('Zarohan', 2988);
+	*/
+	var fetchHeroInfo = function ()
+	{
+		hero = Object.create(Hero);
+		hero.data = Utils.clone(a.response);
+		hero.getItemIds();
+		hero.getItemsInfo();
+	}
+		
+    a.callback = fetchHeroInfo;
+        
+    	
+    	//var h = a.getHero('Zarohan', 2988, '9982759');
+    	
+    </script>
+    </head>
+    <body>
+    </body>
+</html>
