@@ -4,6 +4,9 @@
     <script type="text/javascript" src="./blizzardapi.js"></script>
     <script type="text/javascript" src="./hero.js"></script>
     <script type="text/javascript" src="./profile.js"></script>
+    
+    </head>
+    <body>
     <script type="text/javascript">	
 	
     	var a = Object.create(BlizzardApi);
@@ -26,12 +29,74 @@
 	}
 		
     a.callback = fetchHeroInfo;
+    a.getHero('Zarohan', 2988, '9982759');
+
+    function renderInfo() {
+		var sTable = document.getElementById("statsTable");
+		for(stat in hero.data.stats) {
+			var row = sTable.insertRow(-1);
+			var cell0 = row.insertCell(0);
+			var cell1 = row.insertCell(1);
+			cell0.innerHTML = stat;
+			cell1.innerHTML = Utils.round(hero.data.stats[stat], 3);
+		}
+    }
+
+    function renderItemsInfo()
+    {
+    	var sTable = document.getElementById("statsTable");
+    	all = hero.getAllStats();
+    	var slots = {
+			'bracers': 1,
+			'feet': 2,
+			'hands': 3,
+			'head': 4,
+			'leftFinger': 5,
+			'legs': 6,
+			'mainHand': 7,
+			'neck': 8,
+			'rightFinger': 9,
+			'shoulders': 10,
+			'torso': 11,
+			'waist': 12,
+			'offHand': 13
+		};
+    	var nextSlot = 1;
+    	var row0 = sTable.insertRow(-1);
+    	var cell0 = row0.insertCell(0);
+    	
+    	var i = 1;
+    	for(s in slots) {
+    		cell0 = row0.insertCell(i++);
+    		cell0.innerHTML = s;
+        }
         
-    	
-    	//var h = a.getHero('Zarohan', 2988, '9982759');
-    	
+    	var cells = {};
+		for(attr in all.byAttrs) {
+			var row = sTable.insertRow(-1);
+			cell0 = row.insertCell(0);
+			cell0.innerHTML = attr;
+
+			var cells = {};
+			var i = 1;
+			
+			for(s in slots) {
+	    		cells[s] = row.insertCell(i++);
+	        }
+	        
+			for (slot in all.byAttrs[attr]) {
+				console.log(slot);
+				cells[slot].innerHTML = Utils.round(all.byAttrs[attr][slot], 3);
+			}
+			
+
+		}
+    }
+    
     </script>
-    </head>
-    <body>
+    <input type="button" onclick="renderInfo();" value="calculateStats">
+    <input type="button" onclick="renderItemsInfo();" value="calculte stats by items">
+    <table id="statsTable" border = "1"> 	
+    </table>
     </body>
 </html>
