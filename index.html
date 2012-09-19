@@ -14,7 +14,7 @@
 /*
     	a.callback = function () {
     		profile = Object.create(Profile);
-    		profile.data = _clone(a.response);
+    		profile.data = Utils.clone(a.response);
 	   		console.log(profile);  	
         }
         
@@ -29,6 +29,8 @@
 	}
 		
     a.callback = fetchHeroInfo;
+    //wiz 9982759
+    //monk 7758139
     a.getHero('Zarohan', 2988, '9982759');
 
     function renderInfo() {
@@ -42,11 +44,7 @@
 		}
     }
 
-    function renderItemsInfo()
-    {
-    	var sTable = document.getElementById("statsTable");
-    	all = hero.getAllStats();
-    	var slots = {
+    var slots = {
 			'bracers': 1,
 			'feet': 2,
 			'hands': 3,
@@ -61,6 +59,11 @@
 			'waist': 12,
 			'offHand': 13
 		};
+
+    function makeSlotsTable()
+    {
+    	var sTable = document.getElementById("statsTable");
+		
     	var nextSlot = 1;
     	var row0 = sTable.insertRow(-1);
     	var cell0 = row0.insertCell(0);
@@ -70,11 +73,20 @@
     		cell0 = row0.insertCell(i++);
     		cell0.innerHTML = s;
         }
-        
+
+        return sTable;
+    }
+    
+    function renderItemsInfo()
+    {
+    	var sTable = makeSlotsTable();
+    	var all = hero.getAllStats();
     	var cells = {};
-		for(attr in all.byAttrs) {
+    	
+    	
+    	for(attr in all.byAttrs) { 
 			var row = sTable.insertRow(-1);
-			cell0 = row.insertCell(0);
+			var cell0 = row.insertCell(0);
 			cell0.innerHTML = attr;
 
 			var cells = {};
@@ -85,13 +97,11 @@
 	        }
 	        
 			for (slot in all.byAttrs[attr]) {
-				console.log(slot);
 				cells[slot].innerHTML = Utils.round(all.byAttrs[attr][slot], 3);
 			}
-			
-
 		}
     }
+
     
     </script>
     <input type="button" onclick="renderInfo();" value="calculateStats">
