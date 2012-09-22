@@ -15,15 +15,12 @@ var statObj =  {
 			'waist': 0,
 			'offHand': 0
 		},
-		'affixes': [{
-			'name': '',
-			'quotient': 1,
-		}],
+		'affixes': -1,
 	};
 var Hero = {
 	'data': false,
-	'items': false,
 	'itemsInfo': {},
+	'items': false,
 	'getItemIds':
 		function ()
 		{
@@ -43,7 +40,8 @@ var Hero = {
 				'rightFinger': {},
 				'shoulders': {},
 				'torso': {},
-				'waist': {}
+				'waist': {},
+				'offHand': {}
 			};
 			
 			for (slot in this.data.items) {
@@ -139,34 +137,104 @@ var Hero = {
 		this.const.stats.hp.regen.affixes = [{'name': 'Hitpoints_Regen_Per_Second', 'quotient': 1}];
 		this.const.stats.hp.loh.affixes = [{'name': 'Hitpoints_On_Hit', 'quotient': 1}];
 		
-	//	this.const.stats.hp.weaponDps.affixes = [{'name': '', 'quotient': 1}];
-	//	this.const.stats.hp.finalDps.affixes = [{'name': '', 'quotient': 1}];
-		this.const.stats.hp.speed.affixes = [{'name': 'Attacks_Per_Second_Percent', 'quotient': 1}];
-		this.const.stats.hp.critChance.affixes = [{'name': 'Crit_Percent_Bonus_Capped', 'quotient': 1}];
-		this.const.stats.hp.critDamage.affixes = [{'name': 'Crit_Damage_Percent', 'quotient': 1}];
+	//	this.const.stats.damage.weaponDps.affixes = [{'name': '', 'quotient': 1}];
+	//	this.const.stats.damage.finalDps.affixes = [{'name': '', 'quotient': 1}];
+		this.const.stats.damage.speed.affixes = [{'name': 'Attacks_Per_Second_Percent', 'quotient': 1}];
+		this.const.stats.damage.critChance.affixes = [{'name': 'Crit_Percent_Bonus_Capped', 'quotient': 1}];
+		this.const.stats.damage.critDamage.affixes = [{'name': 'Crit_Damage_Percent', 'quotient': 1}];
 		
 		
-		this.const.stats.hp.armor.affixes = [{'name': 'Armor_Item', 'quotient': 1}, 'name': 'Armor_Bonus_Item', 'quotient': 1}];
-		this.const.stats.hp.bliockChance.affixes = [{'name': 'Block_Chance_Item', 'quotient': 1}];
-		this.const.stats.hp.blockAnountAvg.affixes = [{'name': 'Block_Amount_Item_Min', 'quotient': 1}, {'name': 'Block_Amount_Item_Delta', 'quotient': 0.5}];
-	//	this.const.stats.hp.dodge.affixes = [{'name': 'Dexterity_Item', 'quotient': -1}];
-	//	this.const.stats.hp.minResist.affixes = [{'name': 'Vitality_Item', 'quotient': 1}];
-		this.const.stats.hp.physical.affixes = [{'name': 'Resistance#Physical', 'quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
-		this.const.stats.hp.fire.affixes = [{'name': 'Resistance#fire', 'Quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
-		this.const.stats.hp.lighting.affixes = [{'name': 'Resistance#Lighting', 'quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
-		this.const.stats.hp.arcane.affixes = [{'name': 'Resistance#Arcane', 'quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
-		this.const.stats.hp.poison.affixes = [{'name': 'Resistance#Poison', 'quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
-		this.const.stats.hp.cold.affixes = [{'name': 'Resistance#Cold', 'quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
+		this.const.stats.defence.armor.affixes = [{'name': 'Armor_Item', 'quotient': 1}, {'name': 'Armor_Bonus_Item', 'quotient': 1}, {'name': 'Strength_Item', 'quotient': 1}];
+		this.const.stats.defence.bliockChance.affixes = [{'name': 'Block_Chance_Item', 'quotient': 1}];
+		this.const.stats.defence.blockAnountAvg.affixes = [{'name': 'Block_Amount_Item_Min', 'quotient': 1}, {'name': 'Block_Amount_Item_Delta', 'quotient': 0.5}];
+	//	this.const.stats.defence.dodge.affixes = [{'name': 'Dexterity_Item', 'quotient': -1}];
+	//	this.const.stats.defence.minResist.affixes = [{'name': 'Vitality_Item', 'quotient': 1}];
+		this.const.stats.defence.physical.affixes = [{'name': 'Resistance#Physical', 'quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
+		this.const.stats.defence.fire.affixes = [{'name': 'Resistance#fire', 'quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
+		this.const.stats.defence.lighting.affixes = [{'name': 'Resistance#Lighting', 'quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
+		this.const.stats.defence.arcane.affixes = [{'name': 'Resistance#Arcane', 'quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
+		this.const.stats.defence.poison.affixes = [{'name': 'Resistance#Poison', 'quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
+		this.const.stats.defence.cold.affixes = [{'name': 'Resistance#Cold', 'quotient': 1}, {'name': 'Resistance_All', 'quotient': 1}, {'name': 'Intelligence_Item', 'quotient': 0.1}];
 
-		this.const.stats.hp.str.affixes = [{'name': 'Strength_Item', 'quotient': 1}];
-		this.const.stats.hp.dex.affixes = [{'name': 'Dexterity_Item', 'quotient': 1}];
-		this.const.stats.hp.int.affixes = [{'name': 'Intelligence_Item', 'quotient': 1}];
-		this.const.stats.hp.vit.affixes = [{'name': 'Vitality_Item', 'quotient': 1}];
+		this.const.stats.base.str.affixes = [{'name': 'Strength_Item', 'quotient': 1}];
+		this.const.stats.base.dex.affixes = [{'name': 'Dexterity_Item', 'quotient': 1}];
+		this.const.stats.base.int.affixes = [{'name': 'Intelligence_Item', 'quotient': 1}];
+		this.const.stats.base.vit.affixes = [{'name': 'Vitality_Item', 'quotient': 1}];
 		
-		switch (klass) {
+		switch (klass) { //TODO
 			case 'barb' :
 			break;
 		}
+		
+	},
+	'calcStatsExpanded': function  ()
+	{
+		this.setStatsAffixes();
+		var all = this.getAllStats();
+		
+		// items
+		for(category in this.const.stats) {
+			subCat = this.const.stats[category];
+			for(statIndex in subCat) {
+				stat = subCat[statIndex];
+				
+				if (stat.affixes != -1) {
+					var sum = 0;
+					for (affix in stat.affixes) {
+						var aff = stat.affixes[affix];
+						
+						for (slot in stat.slots) {
+							var v = ((all.byAttrs[aff.name] && !isNaN(all.byAttrs[aff.name][slot])) ? all.byAttrs[aff.name][slot] : 0) * (aff.quotient ? aff.quotient : 0);
+							
+							stat.slots[slot] += v;
+							sum += v;
+						}
+					}
+					stat.sum = sum;
+				}
+			}
+		}
+		
+		var base = this.getBaseStats();
+		this.const.stats.base.str.sum += base.stt;
+		this.const.stats.base.dex.sum += base.dex;
+		this.const.stats.base.int.sum += base.int;
+		this.const.stats.base.vit.sum += base.vit;		
+		
+	},
+	
+	'getBaseStats': function() 
+	{
+		var lvl = this.data.level + this.data.paragonLevel;
+		var str, dex, int, vit;
+		var baseMain = 10;
+		var baseSecond= 8;
+		var baseVit = 9;
+		switch (this.data.class) {
+			case "barbarian":
+				str = baseMain + 3 * lvl;
+				dex = baseSecond + lvl;
+				int = baseSecond + lvl;
+			break;
+			
+			case "demonHunter":
+			case "monk":
+				dex = baseMain + 3 * lvl;
+				int = baseSecond + lvl;
+				str = baseSecond + lvl;
+			break;
+			
+			case "wizard":
+			case "witchDoctor":
+				int = baseMain + 3 * lvl;
+				str = baseSecond + lvl;
+				dex = baseSecond + lvl;
+			break;
+		}
+		
+		vit = baseVit + 2 * lvl;
+		
+		return {'str': str, 'dex': dex, 'int': int, 'vit': vit};
 		
 	}
 };

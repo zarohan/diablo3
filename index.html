@@ -79,27 +79,42 @@
     
     function renderItemsInfo()
     {
+        
+        hero.calcStatsExpanded();
+       	
     	var sTable = makeSlotsTable();
-    	var all = hero.getAllStats();
     	var cells = {};
     	
-    	
-    	for(attr in all.byAttrs) { 
+    	for(category in hero.const.stats) {
+			subCat = hero.const.stats[category];
+			
 			var row = sTable.insertRow(-1);
 			var cell0 = row.insertCell(0);
-			cell0.innerHTML = attr;
-
-			var cells = {};
-			var i = 1;
+			cell0.setAttribute('colSpan', 15);
+			cell0.style.backgroundColor = '#ffcccc';
+			cell0.innerHTML = category;
 			
-			for(s in slots) {
-	    		cells[s] = row.insertCell(i++);
-	        }
-	        
-			for (slot in all.byAttrs[attr]) {
-				cells[slot].innerHTML = Utils.round(all.byAttrs[attr][slot], 3);
-			}
-		}
+			for(statIndex in subCat) {
+
+				var row = sTable.insertRow(-1);
+				var cell0 = row.insertCell(0);
+				cell0.innerHTML = statIndex;
+				
+				stat = subCat[statIndex];
+				
+				var i = 1;
+				var cells = {};
+				for(s in slots) {
+		    		cells[s] = row.insertCell(i++);
+		    		if (subCat[statIndex].slots[s]) {
+		    			cells[s].innerHTML = Utils.round(subCat[statIndex].slots[s], 3);
+					}
+		        }
+				var cell = row.insertCell(i++);
+	    		cell.innerHTML = Utils.round(subCat[statIndex].sum, 3);	
+			}			
+    	}
+
     }
 
     
