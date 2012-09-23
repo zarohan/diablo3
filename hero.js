@@ -49,24 +49,23 @@ var Hero = {
 			}
 			return this.items;
 		},
-	'getItemsInfo':
-		function ()
-		{
-			var itemApi = {};
-    		for (item in this.items) {
-    			itemApi[item] = Object.create(BlizzardApi);
-				itemApi[item].callback = this.bind(function (n)
-				{
-					this.itemsInfo[n] = Utils.clone(itemApi[n].response);
-				}, item);
-				
-				itemApi[item].getItem(this.items[item]);
-            }
-		},
+	'getItemsInfo': function ()
+	{
+		var itemApi = {};
+		for (item in this.items) {
+			itemApi[item] = Object.create(BlizzardApi);
+			itemApi[item].callback = this.bind(function (n)
+			{
+				this.itemsInfo[n] = Utils.clone(itemApi[n].response);
+			}, item);
+			
+			itemApi[item].getItem(this.items[item]);
+        }
+	},
 	'calculateDps': function(dps, stat, itemAttackSpeed, critChance, critDamage)
 	{
 		var flatDmg = dps * (1 + stat/100) * (1 + itemAttackSpeed);
-		var critDmg = flatDmg * critChance * (0.5 + critDamage);
+		var critDmg = flatDmg * (0.05 + critChance) * (0.5 + critDamage);
 		return flatDmg + critDmg; 
 	},
 	'getAllStats': function()
@@ -79,6 +78,27 @@ var Hero = {
 			for (attr in this.itemsInfo[slot].attributesRaw) {
 				(all.byItems[slot] || (all.byItems[slot] = []))[attr] = this.itemsInfo[slot].attributesRaw[attr].max;
 				(all.byAttrs[attr] || (all.byAttrs[attr] = []))[slot] = this.itemsInfo[slot].attributesRaw[attr].max;
+			}
+			
+			if (this.itemsInfo[slot].gems.hasOwnProperty('0')) {
+				for (gemIndex in this.itemsInfo[slot].gems) {
+					var gem = this.itemsInfo[slot].gems[gemIndex];
+					for (attr in gem.attributesRaw) {
+						
+						if (typeof (all.byAttrs[attr] || (all.byAttrs[attr] = []))[slot] != 'undefined') {
+							all.byAttrs[attr][slot] += gem.attributesRaw[attr].max;
+						} else {
+							all.byAttrs[attr][slot] = gem.attributesRaw[attr].max;
+						}
+						
+						if (typeof (all.byItems[slot] || (all.byItems[slot] = []))[attr] != 'undefined') {
+							all.byItems[slot][attr] += gem.attributesRaw[attr].max;
+						} else {
+							all.byItems[slot][attr] = gem.attributesRaw[attr].max;
+						}
+						
+					}
+				}
 			}
 		}
 		return all;
@@ -93,6 +113,12 @@ var Hero = {
 	},
 	'const': {
 		'stats': {
+			'base': {
+				'str': Utils.clone(statObj),
+				'dex': Utils.clone(statObj),
+				'int': Utils.clone(statObj),
+				'vit': Utils.clone(statObj)
+			},
 			'hp': {
 				'base': Utils.clone(statObj),
 				'max': Utils.clone(statObj),
@@ -120,12 +146,6 @@ var Hero = {
 				'arcane': Utils.clone(statObj),
 				'poison': Utils.clone(statObj),
 				'cold': Utils.clone(statObj),
-			},
-			'base': {
-				'str': Utils.clone(statObj),
-				'dex': Utils.clone(statObj),
-				'int': Utils.clone(statObj),
-				'vit': Utils.clone(statObj)
 			}
 		}
 	},
@@ -171,8 +191,9 @@ var Hero = {
 	{
 		this.setStatsAffixes();
 		var all = this.getAllStats();
-		
+
 		// items
+		
 		for(category in this.const.stats) {
 			subCat = this.const.stats[category];
 			for(statIndex in subCat) {
@@ -195,11 +216,58 @@ var Hero = {
 			}
 		}
 		
+		// base
 		var base = this.getBaseStats();
-		this.const.stats.base.str.sum += base.stt;
+		
+		this.const.stats.base.str.sum += base.str;
 		this.const.stats.base.dex.sum += base.dex;
 		this.const.stats.base.int.sum += base.int;
-		this.const.stats.base.vit.sum += base.vit;		
+		this.const.stats.base.vit.sum += base.vit;
+		
+		//defence
+		var defence = this.const.stats.defence;
+		
+		defence.armor.sum += base.str;
+		defence.physical.sum += base.int / 10; 
+		defence.fire.sum += base.int / 10;
+		defence.lighting.sum += base.int / 10;
+		defence.arcane.sum += base.int / 10;
+		defence.poison.sum += base.int / 10;
+		defence.cold.sum += base.int / 10;
+
+		defence.minResist.sum = Math.min(defence.physical.sum, defence.fire.sum, defence.cold.sum, defence.poison.sum, defence.arcane.sum); //without lighting
+		
+		//hp
+		this.const.stats.hp.base.sum += 36 + 4 * (this.data.level) + base.vit * 35;
+		this.const.stats.hp.max.sum = (this.const.stats.hp.base.sum + this.const.stats.hp.base.sum * this.const.stats.hp.percent.sum);
+		
+		// damge
+		var mainStat;
+		switch (this.data.class) {
+			case "barbarian":
+				mainStat = 'str';
+			break;
+			
+			case "monk":
+			case "demonHunter":
+				mainStat = 'dex';
+			break;
+			
+			case "wizard":
+			case "witchDoctor":
+				mainStat = 'int';
+			break;
+		}
+		
+		var damage = this.const.stats.damage; 
+		for (slot in this.const.stats.base[mainStat].slots) {
+			damage.mainStat.slots[slot] = this.const.stats.base[mainStat].slots[slot]; 
+		}
+		damage.mainStat.sum = this.const.stats.base[mainStat].sum;
+		
+		damage.weaponDps.sum = this.itemsInfo.mainHand.dps.max;
+		
+		damage.finalDps.sum = this.calculateDps(damage.weaponDps.sum, damage.mainStat.sum, damage.speed.sum, damage.critChance.sum, damage.critDamage.sum);
 		
 	},
 	
@@ -207,9 +275,9 @@ var Hero = {
 	{
 		var lvl = this.data.level + this.data.paragonLevel;
 		var str, dex, int, vit;
-		var baseMain = 10;
-		var baseSecond= 8;
-		var baseVit = 9;
+		var baseMain = 7;
+		var baseSecond= 7;
+		var baseVit = 7;
 		switch (this.data.class) {
 			case "barbarian":
 				str = baseMain + 3 * lvl;
@@ -217,8 +285,8 @@ var Hero = {
 				int = baseSecond + lvl;
 			break;
 			
-			case "demonHunter":
 			case "monk":
+			case "demonHunter":
 				dex = baseMain + 3 * lvl;
 				int = baseSecond + lvl;
 				str = baseSecond + lvl;
